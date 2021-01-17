@@ -1,7 +1,7 @@
 version: "3"
 services:
   uwsgi:
-    image: alobiorix/sti-project-2-app
+    image: ghcr.io/sti-flask-ftw/sti-project-2-app:latest
     container_name: sti_uwsgi
     restart: always
     ports:
@@ -13,7 +13,7 @@ services:
       - db
 
   db:
-    image: alobiorix/sti-project-2-db
+    image: ghcr.io/sti-flask-ftw/sti-project-2-db:latest
     container_name: sti_db
     restart: always
     ports:
