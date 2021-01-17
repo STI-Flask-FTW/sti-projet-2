@@ -26,12 +26,12 @@ jobs:
       - name: Build application Docker image
         run: |
           echo ${{ secrets.TOKEN }} | docker login ghcr.io -u alobiorix --password-stdin
-          docker build -t ghcr.io/STI-Flask-FTW/sti-project-2-app .
-          docker push ghcr.io/STI-Flask-FTW/sti-project-2-app
+          docker build -t ghcr.io/sti-flask-ftw/sti-project-2-app .
+          docker push ghcr.io/sti-flask-ftw/sti-project-2-app
 
       - name: Build database Docker image
         run: |
           cd docker/mariadb
           echo ${{ secrets.TOKEN }} | docker login ghcr.io -u alobiorix --password-stdin
-          docker build -t ghcr.io/STI-Flask-FTW/sti-project-2-db .
-          docker push ghcr.io/STI-Flask-FTW/sti-project-2-db
+          docker build -t ghcr.io/sti-flask-ftw/sti-project-2-db .
+          docker push ghcr.io/sti-flask-ftw/sti-project-2-db
