@@ -1,0 +1,37 @@
+name: Build & publish stable Docker image
+
+on:
+  push:
+    branches: [ master ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip
+          restore-keys: |
+            ${{ runner.os }}-pip
+
+      - uses: satackey/action-docker-layer-caching@v0.0.8
+        continue-on-error: true
+
+      - uses: actions/setup-python@v2
+        with:
+            python-version: '3.8.6'
+
+      - name: Build application Docker image
+        run: |
+          echo ${{ secrets.token }} | docker login -u alobiorix --password-stdin
+          docker build -t alobiorix/sti-project-2-app .
+          docker push alobiorix/sti-project-2-app
+
+      - name: Build database Docker image
+        run: |
+          cd docker/mariadb
+          echo ${{ secrets.token }} | docker login -u alobiorix --password-stdin
+          docker build -t alobiorix/sti-project-2-db .
+          docker push alobiorix/sti-project-2-db

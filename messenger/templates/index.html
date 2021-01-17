@@ -1,0 +1,27 @@
+<!-- ---------------------------
+Fichier : index.html
+Date : 14.10.2020
+But :
+Remarque :
+------------------------- -->
+
+{% extends 'base.html' %}
+{% block body %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col col-md-8 offset-md-2 mt-5">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-dismissable {{ category }} fade show" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-label-hidden="true">&times;</span></button>{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            Hello, {{ firstname }}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

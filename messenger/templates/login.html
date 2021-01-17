@@ -1,0 +1,50 @@
+<!-- ---------------------------
+Fichier : login.html
+Date : 14.10.2020
+But : Page html de login pour utilisateur
+Remarque :
+------------------------- -->
+
+{% extends 'base.html' %}
+{% block body %}
+
+<div class="container-fluid">
+    <div class="row text-center">
+        <div class="col col-md-8 offset-md-2 mt-5">
+            <h2><b>{{ title }}</b></h2>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col col-md-4 offset-md-4">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-dismissable {{ category }} fade show" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-label-hidden="true">&times;</span></button>{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <!-- What is a CSRF ? Cute and Small Round Feijao -->
+                <div class="form-group">
+                    <label>Username</label>
+                    <input name="username" type="text" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input name="password" type="password" class="form-control" required>
+                </div>
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col col-md-12 text-center">
+            No account yet ? <a href="/signup">Sign up</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
