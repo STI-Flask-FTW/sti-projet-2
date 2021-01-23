@@ -1,4 +1,4 @@
-# STI project 1
+# STI project 2
 
 ## Table of contents
 
@@ -116,8 +116,7 @@ You may use Adminer to access the database using a convenient GUI available at [
 
 ## Authors
 
-Messenger is made by:
+Messenger Security made by:
 
-- Diluckshan RAVINDRANATHAN
 - Eric NOËL
-- Moïn DANAI
+- Vincent CANIPEL
