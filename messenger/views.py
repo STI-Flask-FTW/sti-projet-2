@@ -78,22 +78,13 @@ def compose(msg_title=None, msg_recipient=None):
             'recipient': request.form.get('recipient', type=str),
             'title': request.form.get('title', type=str),
             'body': request.form.get('body', type=str),
-<<<<<<< HEAD
             'tokencsrf': request.form.get('tokencsrf', type=str),
             'cookiecsrf': request.cookies.get('cookiecsrf', type=str)
-=======
-            'tokencsrf' : request.form.get('tokencsrf', type=str),
->>>>>>> ac0fc2bf17723b8c804051a9fe23a6e59c1890da
         }
 
         if (decrypt_csrf_cookie(args['cookiecsrf']) != decrypt_csrf_input(args['tokencsrf'])):
             flash("Possible CSRF !!!", 'alert-danger')
         # ensure fields are present and within database limits
-<<<<<<< HEAD
-=======
-        if(user.tokencsrf==args['tokencsrf']):
-            flash('CSRF CSRF!!', 'alert-danger')
->>>>>>> ac0fc2bf17723b8c804051a9fe23a6e59c1890da
         elif any(x == None for x in args.values()):
             flash('All fields are required', 'alert-danger')
         elif any(len(x) > Model.TEXT_MAX_LEN for x in args.values()):
@@ -122,15 +113,10 @@ def compose(msg_title=None, msg_recipient=None):
         user=user,
         msg_title=msg_title,
         msg_recipient=msg_recipient,
-<<<<<<< HEAD
         tokencsrf=encrypt_csrf_input(anti_csrf_prep)
     ))
     resp.set_cookie('cookiecsrf', encrypt_csrf_cookie(anti_csrf_prep))
     return resp
-=======
-        tokencsrf=user.tokencsrf
-    )
->>>>>>> ac0fc2bf17723b8c804051a9fe23a6e59c1890da
 
 @APP.route('/message/<string:message_id>')
 @is_logged_in

@@ -143,7 +143,6 @@ class User(Model):
         self.lastname = lastname
         self.password = password
         self.messages = Message.from_recipient(self.username)
-        self.tokencsrf = gen_rand_string()
 
     def __str__(self):
         return '{} {} (@{})'.format(
