@@ -78,10 +78,13 @@ def compose(msg_title=None, msg_recipient=None):
             'recipient': request.form.get('recipient', type=str),
             'title': request.form.get('title', type=str),
             'body': request.form.get('body', type=str),
+            'tokencsrf' : request.form.get('tokencsrf', type=str),
         }
 
         # ensure fields are present and within database limits
-        if any(x == None for x in args.values()):
+        if(user.tokencsrf==args['tokencsrf']):
+            flash('CSRF CSRF!!', 'alert-danger')
+        elif any(x == None for x in args.values()):
             flash('All fields are required', 'alert-danger')
         elif any(len(x) > Model.TEXT_MAX_LEN for x in args.values()):
             flash(
@@ -107,7 +110,8 @@ def compose(msg_title=None, msg_recipient=None):
         title='New message',
         user=user,
         msg_title=msg_title,
-        msg_recipient=msg_recipient
+        msg_recipient=msg_recipient,
+        tokencsrf=user.tokencsrf
     )
 
 @APP.route('/message/<string:message_id>')
