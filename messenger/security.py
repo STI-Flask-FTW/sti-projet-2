@@ -4,12 +4,36 @@
 #But :
 #Remarque :
 #------------------------------
-import random, string, base64, hmac, re
-
+import random, string, base64, hmac, re, rsa, base64
 
 SCRYPT_N = 65536
 SCRYPT_SALT_LEN = 16
 API_ID_LEN = 24
+
+(KEY_COOKIE_CSRF_PUBLIC, KEY_COOKIE_CSRF_PRIVATE) = rsa.newkeys(512)
+(KEY_INPUT_CSRF_PUBLIC, KEY_INPUT_CSRF_PRIVATE) = rsa.newkeys(512)
+
+def encrypt_csrf_cookie(clair):
+    return base64.b64encode(rsa.encrypt(clair.encode('utf8'), KEY_COOKIE_CSRF_PUBLIC)).decode('utf8')
+
+def encrypt_csrf_input(clair):
+    return base64.b64encode(rsa.encrypt(clair.encode('utf8'), KEY_INPUT_CSRF_PUBLIC)).decode('utf8')
+
+def decrypt_csrf_cookie(chif):
+    try:
+        chif = base64.b64decode(chif)
+        return rsa.decrypt(chif, KEY_COOKIE_CSRF_PRIVATE).decode('utf8')
+    except:
+        return 'error'
+    
+
+def decrypt_csrf_input(chif):
+    try:
+        chif = base64.b64decode(chif)
+        return rsa.decrypt(chif, KEY_INPUT_CSRF_PRIVATE).decode('utf8')
+    except:
+        return 'errordiff'
+
 
 def implode(pw_hash, salt):
     """

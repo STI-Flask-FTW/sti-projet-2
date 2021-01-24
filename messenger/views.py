@@ -13,7 +13,7 @@ from flask_limiter.util import get_remote_address
 
 from messenger import APP
 from messenger.models import User, Session, Message, Model, get_current_timestamp
-from messenger.security import check_pw, hash_pw, gen_rand_string, pw_complexity
+from messenger.security import check_pw, hash_pw, gen_rand_string, pw_complexity, encrypt_csrf_cookie, encrypt_csrf_input, decrypt_csrf_cookie, decrypt_csrf_input
 from messenger.decorators import is_logged_in, is_admin
 from messenger.jwt import jwt_decode, jwt_encode, get_current_jwt
 
@@ -78,10 +78,14 @@ def compose(msg_title=None, msg_recipient=None):
             'recipient': request.form.get('recipient', type=str),
             'title': request.form.get('title', type=str),
             'body': request.form.get('body', type=str),
+            'tokencsrf': request.form.get('tokencsrf', type=str),
+            'cookiecsrf': request.cookies.get('cookiecsrf', type=str)
         }
 
+        if (decrypt_csrf_cookie(args['cookiecsrf']) != decrypt_csrf_input(args['tokencsrf'])):
+            flash("Possible CSRF !!!", 'alert-danger')
         # ensure fields are present and within database limits
-        if any(x == None for x in args.values()):
+        elif any(x == None for x in args.values()):
             flash('All fields are required', 'alert-danger')
         elif any(len(x) > Model.TEXT_MAX_LEN for x in args.values()):
             flash(
@@ -102,13 +106,17 @@ def compose(msg_title=None, msg_recipient=None):
             )
             flash('Message successfully sent', 'alert-success')
 
-    return render_template(
+    anti_csrf_prep = gen_rand_string()
+    resp = make_response(render_template(
         'compose.html',
         title='New message',
         user=user,
         msg_title=msg_title,
-        msg_recipient=msg_recipient
-    )
+        msg_recipient=msg_recipient,
+        tokencsrf=encrypt_csrf_input(anti_csrf_prep)
+    ))
+    resp.set_cookie('cookiecsrf', encrypt_csrf_cookie(anti_csrf_prep))
+    return resp
 
 @APP.route('/message/<string:message_id>')
 @is_logged_in

@@ -10,6 +10,7 @@ setup(
         'flask-sqlalchemy',
         'pymysql',
         'flask-limiter',
+        'rsa'
     ],
     extras_require={
         'staging': [
