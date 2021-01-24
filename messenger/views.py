@@ -221,10 +221,15 @@ def user_id(username):
             'password': request.form.get('password', type=str),
             'active': request.form.get('active', type=bool),
             'admin': request.form.get('admin', type=bool),
+            'tokencsrf': request.form.get('tokencsrf', type=str),
+            'cookiecsrf': request.cookies.get('cookiecsrf', type=str)
         }
 
         # check if post username matches route
-        if args['username'] != username:
+        if (decrypt_csrf_cookie(args['cookiecsrf']) != decrypt_csrf_input(args['tokencsrf'])):
+            flash("Possible CSRF !!!", 'alert-danger')
+        # ensure fields are present and within database limits
+        elif args['username'] != username:
             flash('Malformed request', 'alert-danger')
             return redirect('/admin')
         # prevent self corruption
@@ -247,12 +252,16 @@ def user_id(username):
         flash('User successfully updated', 'alert-success')
         return redirect('/admin')
 
-    return render_template(
+    anti_csrf_prep = gen_rand_string()
+    resp = make_response(render_template(
         'user_id.html',
         title="Manager user '{}'".format(username),
         user=user,
-        otheruser=otheruser
-    )
+        otheruser=otheruser,
+        tokencsrf=encrypt_csrf_input(anti_csrf_prep)
+    ))
+    resp.set_cookie('cookiecsrf', encrypt_csrf_cookie(anti_csrf_prep))
+    return resp
 
 @APP.route('/user/<string:username>/delete')
 @is_admin
@@ -289,11 +298,16 @@ def user_add():
             'lastname': request.form.get('lastname', type=str),
             'username': request.form.get('username', type=str),
             'password': request.form.get('password', type=str),
-            'password_confirm': request.form.get('password_confirm', type=str)
+            'password_confirm': request.form.get('password_confirm', type=str),
+            'tokencsrf': request.form.get('tokencsrf', type=str),
+            'cookiecsrf': request.cookies.get('cookiecsrf', type=str)
         }
 
         # check for valid data and no user conflicts
-        if any(x == None for x in args.values()):
+        if (decrypt_csrf_cookie(args['cookiecsrf']) != decrypt_csrf_input(args['tokencsrf'])):
+            flash("Possible CSRF !!!", 'alert-danger')
+        # ensure fields are present and within database limits
+        elif any(x == None for x in args.values()):
             flash('All fields are required', 'alert-danger')
         elif any(len(x) > Model.TEXT_MAX_LEN for x in args.values()):
             flash(
@@ -316,11 +330,15 @@ def user_add():
             flash('Account created successfully', 'alert-success')
             return redirect('/admin')
 
-    return render_template(
+    anti_csrf_prep = gen_rand_string()
+    resp = make_response(render_template(
         'user_add.html',
         title='Add new user',
-        user=user
-    )
+        user=user,
+        tokencsrf=encrypt_csrf_input(anti_csrf_prep)
+    ))
+    resp.set_cookie('cookiecsrf', encrypt_csrf_cookie(anti_csrf_prep))
+    return resp
 
 @APP.route('/changePassword', methods=['GET', 'POST'])
 @is_logged_in
@@ -334,10 +352,15 @@ def change_password():
             'newPassword': request.form.get('newPassword', type=str),
             'repeatPassword': request.form.get('repeatPassword', type=str),
             'currentPassword': request.form.get('currentPassword', type=str),
+            'tokencsrf': request.form.get('tokencsrf', type=str),
+            'cookiecsrf': request.cookies.get('cookiecsrf', type=str)
         }
 
         # check for valid data
-        if any(x == None for x in args.values()):
+        if (decrypt_csrf_cookie(args['cookiecsrf']) != decrypt_csrf_input(args['tokencsrf'])):
+            flash("Possible CSRF !!!", 'alert-danger')
+        # ensure fields are present and within database limits
+        elif any(x == None for x in args.values()):
             flash('All fields are required', 'alert-danger')
         elif any(len(x) > Model.TEXT_MAX_LEN for x in args.values()):
             flash(
@@ -358,11 +381,15 @@ def change_password():
             flash('Password successfully changed', 'alert-success')
             return logout(False)
 
-    return render_template(
+    anti_csrf_prep = gen_rand_string()
+    resp = make_response(render_template(
         'changePassword.html',
         title='Change password',
-        user=user
-    )
+        user=user,
+        tokencsrf=encrypt_csrf_input(anti_csrf_prep)
+    ))
+    resp.set_cookie('cookiecsrf', encrypt_csrf_cookie(anti_csrf_prep))
+    return resp
 
 @APP.route('/login', methods=['GET', 'POST'])
 @limiter.limit("5 per minute")
